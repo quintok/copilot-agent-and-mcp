@@ -69,6 +69,11 @@ function createReviewsRouter({ booksFile, reviewsFile, readJSON, writeJSON, auth
     }
 
     const username = req.user && req.user.username;
+    // generated-by-copilot: require a username for per-user rate limiting; without
+    // it a shared bucket would allow unlimited submissions
+    if (!username) {
+      return res.status(401).json({ message: 'Invalid authentication token' });
+    }
     const now = Date.now();
     const last = lastSubmission.get(username);
     if (last && now - last < REVIEW_RATE_LIMIT_MS) {
