@@ -1,4 +1,5 @@
 const express = require('express');
+const VALID_SORT_OPTIONS = ['title', 'author'];
 
 function createBooksRouter({ booksFile, readJSON, writeJSON, authenticateToken }) {
   const router = express.Router();
@@ -7,7 +8,7 @@ function createBooksRouter({ booksFile, readJSON, writeJSON, authenticateToken }
     const books = readJSON(booksFile);
     const sortBy = req.query.sortBy;
 
-    if (!['title', 'author', undefined].includes(sortBy)) {
+    if (sortBy && !VALID_SORT_OPTIONS.includes(sortBy)) {
       return res.status(400).json({ error: 'Invalid sortBy parameter. Use "title" or "author".' });
     }
 

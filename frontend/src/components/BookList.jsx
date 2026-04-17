@@ -60,7 +60,7 @@ const BookList = () => {
           <option value="title">Title (A-Z)</option>
           <option value="author">Author (A-Z)</option>
         </select>
-        <span className={styles.sortIndicator} aria-live="polite" role="status">
+        <span className={styles.sortIndicator}>
           Currently sorted by {sortBy === 'author' ? 'Author (A-Z)' : 'Title (A-Z)'}
         </span>
       </div>
