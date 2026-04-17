@@ -24,10 +24,9 @@ const BookList = () => {
   }, [dispatch, token, navigate, sortBy]);
 
   useEffect(() => {
-    if (!token) {
-      return;
+    if (token) {
+      dispatch(fetchFavorites(token));
     }
-    dispatch(fetchFavorites(token));
   }, [dispatch, token]);
 
   const handleAddFavorite = async (bookId) => {
@@ -61,7 +60,7 @@ const BookList = () => {
           <option value="title">Title (A-Z)</option>
           <option value="author">Author (A-Z)</option>
         </select>
-        <span className={styles.sortIndicator}>
+        <span className={styles.sortIndicator} aria-live="polite" role="status">
           Currently sorted by {sortBy === 'author' ? 'Author (A-Z)' : 'Title (A-Z)'}
         </span>
       </div>
