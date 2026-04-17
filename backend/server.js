@@ -20,6 +20,9 @@ const booksFile = isTest
 const usersFile = isTest
   ? path.join(__dirname, 'data', 'test-users.json')
   : path.join(__dirname, 'data', 'users.json');
+const reviewsFile = isTest
+  ? path.join(__dirname, 'data', 'test-reviews.json')
+  : path.join(__dirname, 'data', 'reviews.json');
 
 // Helper functions
 function readJSON(file) {
@@ -48,6 +51,7 @@ const createApiRouter = require('./routes');
 app.use('/api', createApiRouter({
   usersFile,
   booksFile,
+  reviewsFile,
   readJSON,
   writeJSON,
   authenticateToken,
