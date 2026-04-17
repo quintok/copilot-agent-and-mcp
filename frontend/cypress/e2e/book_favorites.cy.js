@@ -3,6 +3,13 @@ describe('Book Favorites App', () => {
   const username = `e2euser${Math.floor(Math.random() * 1000)}`;
   const password = `e2epass${Math.floor(Math.random() * 1000)}`;
   const user = { username, password };
+  const verifyAlphabeticalOrder = (selector, transform = value => value.trim()) => {
+    cy.get(selector).then($elements => {
+      const values = [...$elements].map(el => transform(el.innerText));
+      const sortedValues = [...values].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+      expect(values).to.deep.equal(sortedValues);
+    });
+  };
 
   beforeEach(() => {
     cy.visit('http://localhost:5173');
@@ -45,20 +52,12 @@ describe('Book Favorites App', () => {
 
     cy.get('select#book-sort').should('have.value', 'title');
     cy.contains('Currently sorted by Title (A-Z)').should('exist');
-    cy.get('div[class*="bookTitle"]').then($titles => {
-      const titleTexts = [...$titles].map(el => el.innerText.trim());
-      const sortedTitles = [...titleTexts].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
-      expect(titleTexts).to.deep.equal(sortedTitles);
-    });
+    verifyAlphabeticalOrder('[data-testid="book-title"]');
 
     cy.get('select#book-sort').select('author');
     cy.get('select#book-sort').should('have.value', 'author');
     cy.contains('Currently sorted by Author (A-Z)').should('exist');
-    cy.get('div[class*="bookAuthor"]').then($authors => {
-      const authorTexts = [...$authors].map(el => el.innerText.replace(/^by\s+/, '').trim());
-      const sortedAuthors = [...authorTexts].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
-      expect(authorTexts).to.deep.equal(sortedAuthors);
-    });
+    verifyAlphabeticalOrder('[data-testid="book-author"]', value => value.replace(/^by\s+/, '').trim());
 
     cy.get('a#favorites-link').click();
     cy.get('h2').contains('My Favorite Books').should('exist');
@@ -66,11 +65,7 @@ describe('Book Favorites App', () => {
     cy.get('a#books-link').click();
     cy.get('select#book-sort').should('have.value', 'author');
     cy.contains('Currently sorted by Author (A-Z)').should('exist');
-    cy.get('div[class*="bookAuthor"]').then($authors => {
-      const authorTexts = [...$authors].map(el => el.innerText.replace(/^by\s+/, '').trim());
-      const sortedAuthors = [...authorTexts].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
-      expect(authorTexts).to.deep.equal(sortedAuthors);
-    });
+    verifyAlphabeticalOrder('[data-testid="book-author"]', value => value.replace(/^by\s+/, '').trim());
   });
 
   it('should logout and protect routes', () => {

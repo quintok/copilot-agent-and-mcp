@@ -91,8 +91,8 @@ const BookList = () => {
                     </svg>
                   </span>
                 )}
-                <div className={styles.bookTitle}>{book.title}</div>
-                <div className={styles.bookAuthor}>by {book.author}</div>
+                <div data-testid="book-title" className={styles.bookTitle}>{book.title}</div>
+                <div data-testid="book-author" className={styles.bookAuthor}>by {book.author}</div>
                 <button
                   className={styles.simpleBtn}
                   onClick={() => handleAddFavorite(book.id)}
