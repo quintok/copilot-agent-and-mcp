@@ -5,6 +5,7 @@ import { fetchBooks } from '../store/booksSlice';
 import { addFavorite, fetchFavorites } from '../store/favoritesSlice';
 import { useNavigate } from 'react-router-dom';
 import styles from '../styles/BookList.module.css';
+import Reviews from './Reviews';
 
 const BookList = () => {
   const dispatch = useAppDispatch();
@@ -73,6 +74,7 @@ const BookList = () => {
                 >
                   {isFavorite ? 'In Favorites' : 'Add to Favorites'}
                 </button>
+                <Reviews bookId={book.id} />
               </div>
             );
           })}
