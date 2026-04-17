@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { fetchBooks } from '../store/booksSlice';
+import { fetchBooks, setSortBy } from '../store/booksSlice';
 import { addFavorite, fetchFavorites } from '../store/favoritesSlice';
 import { useNavigate } from 'react-router-dom';
 import styles from '../styles/BookList.module.css';
@@ -13,15 +13,21 @@ const BookList = () => {
   const token = useAppSelector(state => state.user.token);
   const navigate = useNavigate();
   const favorites = useAppSelector(state => state.favorites.items);
+  const sortBy = useAppSelector(state => state.books.sortBy);
 
   useEffect(() => {
     if (!token) {
       navigate('/');
       return;
     }
-    dispatch(fetchBooks());
-    dispatch(fetchFavorites(token));
-  }, [dispatch, token, navigate]);
+    dispatch(fetchBooks(sortBy));
+  }, [dispatch, token, navigate, sortBy]);
+
+  useEffect(() => {
+    if (token) {
+      dispatch(fetchFavorites(token));
+    }
+  }, [dispatch, token]);
 
   const handleAddFavorite = async (bookId) => {
     if (!token) {
@@ -32,12 +38,32 @@ const BookList = () => {
     dispatch(fetchFavorites(token));
   };
 
+  const handleSortChange = (event) => {
+    const nextSortBy = event.target.value;
+    dispatch(setSortBy(nextSortBy));
+  };
+
   if (status === 'loading') return <div>Loading...</div>;
   if (status === 'failed') return <div>Failed to load books.</div>;
 
   return (
     <div>
       <h2>Books</h2>
+      <div className={styles.sortControls}>
+        <label htmlFor="book-sort" className={styles.sortLabel}>Sort by</label>
+        <select
+          id="book-sort"
+          className={styles.sortSelect}
+          value={sortBy}
+          onChange={handleSortChange}
+        >
+          <option value="title">Title (A-Z)</option>
+          <option value="author">Author (A-Z)</option>
+        </select>
+        <span className={styles.sortIndicator}>
+          Currently sorted by {sortBy === 'author' ? 'Author (A-Z)' : 'Title (A-Z)'}
+        </span>
+      </div>
       {books.length === 0 ? (
         <div style={{
           background: '#fff',
@@ -65,8 +91,8 @@ const BookList = () => {
                     </svg>
                   </span>
                 )}
-                <div className={styles.bookTitle}>{book.title}</div>
-                <div className={styles.bookAuthor}>by {book.author}</div>
+                <div data-testid="book-title" className={styles.bookTitle}>{book.title}</div>
+                <div data-testid="book-author" className={styles.bookAuthor}>by {book.author}</div>
                 <button
                   className={styles.simpleBtn}
                   onClick={() => handleAddFavorite(book.id)}

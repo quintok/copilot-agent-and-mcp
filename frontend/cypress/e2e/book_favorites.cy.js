@@ -3,6 +3,13 @@ describe('Book Favorites App', () => {
   const username = `e2euser${Math.floor(Math.random() * 1000)}`;
   const password = `e2epass${Math.floor(Math.random() * 1000)}`;
   const user = { username, password };
+  const verifyAlphabeticalOrder = (selector, transform = value => value.trim()) => {
+    cy.get(selector).then($elements => {
+      const values = [...$elements].map(el => transform(el.innerText));
+      const sortedValues = [...values].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+      expect(values).to.deep.equal(sortedValues);
+    });
+  };
 
   beforeEach(() => {
     cy.visit('http://localhost:5173');
@@ -34,6 +41,31 @@ describe('Book Favorites App', () => {
     cy.get('button').contains('Add to Favorites').first().click();
     cy.get('a#favorites-link').click();
     cy.get('h2').contains('My Favorite Books').should('exist');
+  });
+
+  it('should allow sorting books and keep sort selection when navigating', () => {
+    cy.contains('Login').click();
+    cy.get('input[name="username"]').type(user.username);
+    cy.get('input[name="password"]').type(user.password);
+    cy.get('button#login').click();
+    cy.contains('Books').click();
+
+    cy.get('select#book-sort').should('have.value', 'title');
+    cy.contains('Currently sorted by Title (A-Z)').should('exist');
+    verifyAlphabeticalOrder('[data-testid="book-title"]');
+
+    cy.get('select#book-sort').select('author');
+    cy.get('select#book-sort').should('have.value', 'author');
+    cy.contains('Currently sorted by Author (A-Z)').should('exist');
+    verifyAlphabeticalOrder('[data-testid="book-author"]', value => value.replace(/^by\s+/, '').trim());
+
+    cy.get('a#favorites-link').click();
+    cy.get('h2').contains('My Favorite Books').should('exist');
+
+    cy.get('a#books-link').click();
+    cy.get('select#book-sort').should('have.value', 'author');
+    cy.contains('Currently sorted by Author (A-Z)').should('exist');
+    verifyAlphabeticalOrder('[data-testid="book-author"]', value => value.replace(/^by\s+/, '').trim());
   });
 
   it('should logout and protect routes', () => {
