@@ -45,13 +45,20 @@ describe('Book Favorites App', () => {
 
     cy.get('select#book-sort').should('have.value', 'title');
     cy.contains('Currently sorted by Title (A-Z)').should('exist');
-    cy.contains('1984').should('exist');
+    cy.get('div[class*="bookTitle"]').then($titles => {
+      const titleTexts = [...$titles].map(el => el.innerText.trim());
+      const sortedTitles = [...titleTexts].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+      expect(titleTexts).to.deep.equal(sortedTitles);
+    });
 
     cy.get('select#book-sort').select('author');
     cy.get('select#book-sort').should('have.value', 'author');
     cy.contains('Currently sorted by Author (A-Z)').should('exist');
-    cy.contains('The Stranger').should('exist');
-    cy.contains('by Albert Camus').should('exist');
+    cy.get('div[class*="bookAuthor"]').then($authors => {
+      const authorTexts = [...$authors].map(el => el.innerText.replace(/^by\s+/, '').trim());
+      const sortedAuthors = [...authorTexts].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+      expect(authorTexts).to.deep.equal(sortedAuthors);
+    });
 
     cy.get('a#favorites-link').click();
     cy.get('h2').contains('My Favorite Books').should('exist');
@@ -59,6 +66,11 @@ describe('Book Favorites App', () => {
     cy.get('a#books-link').click();
     cy.get('select#book-sort').should('have.value', 'author');
     cy.contains('Currently sorted by Author (A-Z)').should('exist');
+    cy.get('div[class*="bookAuthor"]').then($authors => {
+      const authorTexts = [...$authors].map(el => el.innerText.replace(/^by\s+/, '').trim());
+      const sortedAuthors = [...authorTexts].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+      expect(authorTexts).to.deep.equal(sortedAuthors);
+    });
   });
 
   it('should logout and protect routes', () => {
