@@ -53,6 +53,32 @@
   box-shadow: none !important;
   background: none !important;
 }
+
+.sortControls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.sortLabel {
+  font-weight: 600;
+  color: #333;
+}
+
+.sortSelect {
+  border: 1px solid #20b2aa;
+  border-radius: 4px;
+  background: #fff;
+  color: #333;
+  padding: 0.35rem 0.6rem;
+}
+
+.sortIndicator {
+  color: #20b2aa;
+  font-weight: 600;
+}
+
 .bookGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
