@@ -12,6 +12,16 @@ function createFavoritesRouter({ usersFile, booksFile, readJSON, writeJSON, auth
     res.json(favorites);
   });
 
+  // generated-by-copilot: DELETE /api/favorites clears all favorites for the current user
+  router.delete('/', authenticateToken, (req, res) => {
+    const users = readJSON(usersFile);
+    const user = users.find(u => u.username === req.user.username);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    user.favorites = [];
+    writeJSON(usersFile, users);
+    res.status(200).json({ message: 'All favorites cleared' });
+  });
+
   router.post('/', authenticateToken, (req, res) => {
     const { bookId } = req.body;
     if (!bookId) return res.status(400).json({ message: 'Book ID required' });
